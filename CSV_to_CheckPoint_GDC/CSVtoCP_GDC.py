@@ -1,7 +1,7 @@
 # Picked list from https://zenodo.org/record/6531758/files/DoH%20Internet%20Servers%20Dataset.csv?download=1
 # help from: https://www.geeksforgeeks.org/load-csv-data-into-list-and-dictionary-using-python/
 # https://sparkbyexamples.com/pandas/pandas-convert-dataframe-to-dictionary/
-# version sod knows as I spent a week on this - 250822 - v1.0
+# version sod knows as I spent a week on this - 030922 - v1.1
 import pandas as pd
 import json
 import uuid
