@@ -6,6 +6,7 @@ import pandas as pd
 import json
 import uuid
 import copy
+import ipaddress
 
 # vars
 working_dict = []
@@ -48,6 +49,7 @@ def addkeypairs():
 
 # let's just make the names unique too complicated otherwise
 # concatting identical rows, into a single object with two addresses was mentally complicated
+# more fixes to expand ip6 addresses - 030922
 def fixuniquenames():
     global working_dict
     dictpositionvar = 0
@@ -61,19 +63,30 @@ def fixuniquenames():
                 dictpositionvar += 1
             if rangekeytoupdate in key:
                 currentrange = listdicts.get('ranges')
-                updatelist = currentrange.split(':', 1)
-                listdicts.update({rangekeytoupdate: updatelist})
+                currentrangecopy = copy.deepcopy(currentrange)
+                ipvar = ipaddress.ip_address(currentrangecopy)
+                if ipvar.version == 6:
+                    currentrangev6 = ipaddress.IPv6Address(currentrange)
+                    currentrangev6 = currentrangev6.exploded
+                    updatev6list = currentrangev6.split(' ', 1)
+                    listdicts.update({rangekeytoupdate: updatev6list})
+                else:
+                    currentrangev4 = currentrange
+                    updatev4list = currentrangev4.split(' ', 1)
+                    listdicts.update({rangekeytoupdate: updatev4list})
 
 # This function dumps it out to JSON that Check Point can use
+# added appended filetype extension - 030922
 def dumptojson():
     global gdclistdict, working_dict
     desckeyname = 'description'
     objkeyname = 'objects'
-    newgdcname = input("What's the name of your new GDC?")
+    newgdcname = input("What's the name of your new GDC? >")
     gdclistdict.update({desckeyname: newgdcname})
     gdclistdict.update({objkeyname: list()})
     gdclistdict.update({objkeyname: working_dict})
-    filename = input("What's the filename you want to dump to")
+    filename = input("What's the filename you want to dump to >")
+    filename = filename + ".json"
     tojson = json.dumps(gdclistdict, sort_keys=True, indent=4, separators=(',', ': '))
     with open(filename, "w") as outfile:
         outfile.write(tojson)
